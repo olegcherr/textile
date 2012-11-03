@@ -609,6 +609,37 @@ Links :
 
     <p><a href="linkurl" class="linkclass" lang="de-de" id="linkid" title="Link Title"><img src="imgurl" class="imgclass" id="imgid" title="img/link text" alt="img/link text" /></a></p>
 
+Array Links :
+  input  : |
+    "Array link":/search?phparray[]=test
+
+    Here is "my link":http://github.com?param[]=value with some other...
+
+    In a sentence "my link":http://github.com?param[]=value. And another...
+
+    In a sentence "my link":http://github.com?param[]=val&par2[]=val2&l=en&enc=utf-8#end.
+
+    ...blah blah ^["on github":http://github.com?param[]=val&par2[]=val2&l=en&enc=utf-8#end]^ blah...
+
+    ...blah blah[^["on github":http://github.com?param[]=val&par2[]=val2&l=en&enc=utf-8#end]^]blah...
+
+    ...blah blah (for more details look on "github":http://github.com?q[]=one,2#end) blah blah...
+
+  expect: |
+    <p><a href="/search?phparray[]=test">Array link</a></p>
+
+    <p>Here is <a href="http://github.com?param[]=value">my link</a> with some other&#8230;</p>
+
+    <p>In a sentence <a href="http://github.com?param[]=value">my link</a>. And another&#8230;</p>
+
+    <p>In a sentence <a href="http://github.com?param[]=val&amp;par2[]=val2&amp;l=en&amp;enc=utf-8#end">my link</a>.</p>
+
+    <p>&#8230;blah blah <sup><a href="http://github.com?param[]=val&amp;par2[]=val2&amp;l=en&amp;enc=utf-8#end">on github</a></sup> blah&#8230;</p>
+
+    <p>&#8230;blah blah<sup><a href="http://github.com?param[]=val&amp;par2[]=val2&amp;l=en&amp;enc=utf-8#end">on github</a></sup>blah&#8230;</p>
+
+    <p>&#8230;blah blah (for more details look on <a href="http://github.com?q[]=one,2#end">github</a>) blah blah&#8230;</p>
+
 Unicode Links :
   input  : |
     "Übermensch":https://de.wikipedia.org/wiki/Übermensch
