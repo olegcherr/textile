@@ -1543,6 +1543,8 @@ class Textile
 // -------------------------------------------------------------
 	function links($text)
 	{
+		$urlCharTerminator = '\['; // Chars to avoid on an url end to allow links like "test?param[]=value"
+
 		return preg_replace_callback('/
 			(^|(?<=[\s>.\(])|[{[]) # $pre
 			"                      # start
@@ -1550,9 +1552,9 @@ class Textile
 			([^"]+?)               # $text
 			(?:\(([^)]+?)\)(?="))? # $title
 			":
-			('.$this->urlch.'+?)   # $url
+			('.$this->urlch.'+?[^'.$urlCharTerminator.'])   # $url
 			(\/)?                  # $slash
-			([^'.$this->regex_snippets['wrd'].'\/;]*?)  # $post
+			([^'.$this->regex_snippets['wrd'].'\/'.$urlCharTerminator.';]*?)  # $post
 			([\]}]|(?=\s|$|\)))	   # $tail
 			/x'.$this->regex_snippets['mod'], array(&$this, "fLink"), $text);
 	}
