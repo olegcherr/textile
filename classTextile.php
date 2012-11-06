@@ -1568,14 +1568,6 @@ class Textile
 		$url   = $m['url'] . $m['urlx'];
 		$m = array();
 
-		/* preg_match( '/ */
-		/* 	^ */
-		/* 	(?P<atts>' . $this->c . ')   # $atts */
-		/* 	(?P<text>[^(]+?)             # $text */
-		/* 	(?:\((?P<title>[^)]+?)\))?   # $title */
-		/* 	$ */
-		/* 	/x'.$this->regex_snippets['mod'], $inner, $m */
-		/* ); */
 		// Split inner into $atts, $text and $title..
 		preg_match( '/
 			^
