@@ -1814,7 +1814,6 @@ class Textile
 		list(, $algn, $atts, $period, $url, $title, $href) = array_pad($m, 7, '');
 
 		if( '.' === $period ) $url = ".$url";
-		$url = htmlspecialchars($url);
 
 		$extras = $align = '';
 
