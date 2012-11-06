@@ -1596,8 +1596,9 @@ class Textile
 			')'  => null,
 		);
 
-		// Look for footnotes at the end of the url...
+		// Look for footnotes or other square-bracket delimieted stuff at the end of the url...
 		// eg. "text":url][otherstuff... will have "[otherstuff" popped back out.
+		//     "text":url?q[]=x][123]    will have "[123]" popped off the back
 		if( $counts[']'] ) {
 			if( 1 === preg_match( '@(?P<url>^.*\])(?P<tight>\[.*?)$@' . $this->regex_snippets['mod'], $url, $m ) ) {
 				$url         = $m['url'];
