@@ -681,6 +681,10 @@ Unicode Links :
 
     "福島駅":link6 this is a test -- with a trailing slash.
 
+    "福島駅":http://ja.wikipedia.org/wiki/福島駅_(大阪府), what do you think?
+
+    "福島駅":http://ja.wikipedia.org/wiki/福島駅_(大阪府)/?q[]=x.
+
     "äöüÄÖÜßçéáóúèàòùÉÁÓÚÈÀÒÙêÊôÔâÂûÛåÅœŒæÆøØëËïÏ with trailing slash":link4
 
     "äöüÄÖÜßçéáóúèàòùÉÁÓÚÈÀÒÙêÊôÔâÂûÛåÅœŒæÆøØëËïÏ with trailing slash":https://en.wikipedia.com/ä/öüÄÖÜßç/éáóúè/àòùÉÁÓÚ/ÈÀÒÙêÊôÔâÂû/ÛåÅœŒæÆøØëËïÏ/
@@ -705,6 +709,10 @@ Unicode Links :
     <p><a href="https://en.wikipedia.com/%C3%A4/%C3%B6%C3%BC%C3%84%C3%96%C3%9C%C3%9F%C3%A7/%C3%A9%C3%A1%C3%B3%C3%BA%C3%A8/%C3%A0%C3%B2%C3%B9%C3%89%C3%81%C3%93%C3%9A/%C3%88%C3%80%C3%92%C3%99%C3%AA%C3%8A%C3%B4%C3%94%C3%A2%C3%82%C3%BB/%C3%9B%C3%A5%C3%85%C5%93%C5%92%C3%A6%C3%86%C3%B8%C3%98%C3%AB%C3%8B%C3%AF%C3%8F">äöüÄÖÜßçéáóúèàòùÉÁÓÚÈÀÒÙêÊôÔâÂûÛåÅœŒæÆøØëËïÏ without trailing slash</a></p>
 
     <p><a href="http://ja.wikipedia.org/wiki/%E7%A6%8F%E5%B3%B6%E9%A7%85_%28%E5%A4%A7%E9%98%AA%E5%BA%9C%29/">福島駅</a> this is a test &#8212; with a trailing slash.</p>
+
+    <p><a href="http://ja.wikipedia.org/wiki/%E7%A6%8F%E5%B3%B6%E9%A7%85_%28%E5%A4%A7%E9%98%AA%E5%BA%9C%29">福島駅</a>, what do you think?</p>
+
+    <p><a href="http://ja.wikipedia.org/wiki/%E7%A6%8F%E5%B3%B6%E9%A7%85_%28%E5%A4%A7%E9%98%AA%E5%BA%9C%29/?q[]=x">福島駅</a>.</p>
 
     <p><a href="https://en.wikipedia.com/%C3%A4/%C3%B6%C3%BC%C3%84%C3%96%C3%9C%C3%9F%C3%A7/%C3%A9%C3%A1%C3%B3%C3%BA%C3%A8/%C3%A0%C3%B2%C3%B9%C3%89%C3%81%C3%93%C3%9A/%C3%88%C3%80%C3%92%C3%99%C3%AA%C3%8A%C3%B4%C3%94%C3%A2%C3%82%C3%BB/%C3%9B%C3%A5%C3%85%C5%93%C5%92%C3%A6%C3%86%C3%B8%C3%98%C3%AB%C3%8B%C3%AF%C3%8F/">äöüÄÖÜßçéáóúèàòùÉÁÓÚÈÀÒÙêÊôÔâÂûÛåÅœŒæÆøØëËïÏ with trailing slash</a></p>
 
@@ -1329,6 +1337,20 @@ Issue 61... Spans in tables :
     <td> fourth </td>
     <td> Foreign <span class="caps">EXPÓŅÉNTIAL</span> </td>
     <td> 6 </td>
+    </tr>
+    </table>
+
+Issue 88... links in cells with no surrounding spaces :
+  input  : |
+    |"Goo-what?":https://google.com|("(class)[de]no-space(No spaces here!)":http://google.com[])| "_front-space_":http://ja.wikipedia.org/wiki/福島駅_(大阪府)|"(class){color: red}*_rear-space_*(At the back!)":http://google.com/ | "front-and-rear":http://google.com/?q[1]=1&q[two]=2 |
+  expect : |
+    <table>
+    <tr>
+    <td><a href="https://google.com">Goo-what?</a></td>
+    <td>(<a href="http://google.com[]" class="class" lang="de" title="No spaces here!">no-space</a>)</td>
+    <td> <a href="http://ja.wikipedia.org/wiki/%E7%A6%8F%E5%B3%B6%E9%A7%85_%28%E5%A4%A7%E9%98%AA%E5%BA%9C%29"><em>front-space</em></a></td>
+    <td><a href="http://google.com/" style="color: red;" class="class" title="At the back!"><strong><em>rear-space</em></strong></a> </td>
+    <td> <a href="http://google.com/?q[1]=1&amp;q[two]=2">front-and-rear</a> </td>
     </tr>
     </table>
 
