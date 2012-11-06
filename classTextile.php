@@ -1790,12 +1790,12 @@ class Textile
 		return preg_replace_callback("/
 			(?:[[{])?		   # pre
 			\!				   # opening !
-			(\<|\=|\>)? 	   # optional alignment atts
-			($this->c)		   # optional style,class atts
-			(?:\. )?		   # optional dot-space
-			([^\s(!]+)		   # presume this is the src
+			(\<|\=|\>)? 	   # algn optional alignment atts
+			($this->c)		   # atts optional style,class atts
+			(\. )?  		   # period optional dot-space
+			([^\s(!]+)		   # url presume this is the src
 			\s? 			   # optional space
-			(?:\(([^\)]+)\))?  # optional title
+			(?:\(([^\)]+)\))?  # title optional title
 			\!				   # closing
 			(?::(\S+))? 	   # optional href
 			(?:[\]}]|(?=\s|$|\))) # lookahead: space or end of string
@@ -1805,10 +1805,13 @@ class Textile
 // -------------------------------------------------------------
 	function fImage($m)
 	{
-		list(, $algn, $atts, $url) = $m;
+		list(, $algn, $atts, $period, $url, $title, $href) = array_pad($m, 7, '');
+
+		if( '.' === $period ) $url = ".$url";
 		$url = htmlspecialchars($url);
 
 		$extras = $align = '';
+
 		if( '' !== $algn ) {
 			$vals = array(
 				'<' => 'left',
@@ -1823,10 +1826,9 @@ class Textile
 		}
 		$atts  = $this->pba($atts , '' , 1 , $extras) . $align;
 
- 		if(isset($m[4]))
- 		{
- 			$m[4] = htmlspecialchars($m[4]);
-			$atts .= ' title="' . $m[4] . '" alt="'	 . $m[4] . '"';
+		if ('' !== $title) {
+			$title = htmlspecialchars($title);
+			$atts .= ' title="' . $title . '" alt="'	 . $title . '"';
  		}
  		else
  			$atts .= ' alt=""';
@@ -1836,7 +1838,7 @@ class Textile
 			$size = @getimagesize(realpath($this->doc_root.ltrim($url, $this->ds)));
 		if ($size) $atts .= " $size[3]";
 
-		$href = (isset($m[5])) ? $this->shelveURL($m[5]) : '';
+		$href = ($href) ? $this->shelveURL($href) : '';
 		$url = $this->shelveURL($url);
 
 		$out = array(
