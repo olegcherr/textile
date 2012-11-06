@@ -1586,19 +1586,19 @@ class Textile
 		$title = isset($m['title']) ? $m['title'] : '';
 		$m = array();
 
-		// Parse the uri backwards and pop off any chars that don't belong there (like . or , or unmatched brackets of various kinds)...
 		$pop = $tight = '';
 		$url_chars = array();
 		$counts = array(
 			'['  => null,
-			']'  => mb_substr_count($url, ']', 'UTF-8'),
+			']'  => mb_substr_count($url, ']', 'UTF-8'), # We need to know how many closing square brackets we have
 			'('  => null,
 			')'  => null,
 		);
 
 		// Look for footnotes or other square-bracket delimieted stuff at the end of the url...
 		// eg. "text":url][otherstuff... will have "[otherstuff" popped back out.
-		//     "text":url?q[]=x][123]    will have "[123]" popped off the back, the remaining closing square brackets will later be tested for balance
+		//     "text":url?q[]=x][123]    will have "[123]" popped off the back, the remaining closing square brackets
+		//                               will later be tested for balance
 		if( $counts[']'] ) {
 			if( 1 === preg_match( '@(?P<url>^.*\])(?P<tight>\[.*?)$@' . $this->regex_snippets['mod'], $url, $m ) ) {
 				$url         = $m['url'];
@@ -1608,8 +1608,9 @@ class Textile
 		}
 
 		// Split off any trailing text that isn't part of an array assignment.
-		// eg. "text":...?q[]=value1&q[]=value2      ... is ok
-		//     "text":...?q[]=value1]following  ... would have "following" popped back out and the remaining square bracket will later be tested for balance
+		// eg. "text":...?q[]=value1&q[]=value2 ... is ok
+		//     "text":...?q[]=value1]following  ... would have "following" popped back out and the remaining square bracket
+		//                                          will later be tested for balance
 		if( $counts[']']) {
 			if( 1 === preg_match( '@(?P<url>^.*\])(?!=)(?P<end>.*?)$@' . $this->regex_snippets['mod'], $url, $m) ) {
 				$url         = $m['url'];
@@ -1625,7 +1626,8 @@ class Textile
 			$url_chars[] = mb_substr( $url, $i, 1 );
 		}
 
-		// Now we have the array of all the multi-byte chars in the url
+		// Now we have the array of all the multi-byte chars in the url we will parse the uri backwards and pop off
+		// any chars that don't belong there (like . or , or unmatched brackets of various kinds)...
 		$first = true;
 		do {
 			$c = array_pop($url_chars);
