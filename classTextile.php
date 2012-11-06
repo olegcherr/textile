@@ -1596,7 +1596,8 @@ class Textile
 			')'  => null,
 		);
 
-		// Look for footnotes at the end of the url... TODO add better explanation
+		// Look for footnotes at the end of the url...
+		// eg. "text":url][otherstuff... will have "[otherstuff" popped back out.
 		if( $counts[']'] ) {
 			if( 1 === preg_match( '@(?P<url>^.*\])(?P<tight>\[.*?)$@' . $this->regex_snippets['mod'], $url, $m ) ) {
 				$url         = $m['url'];
@@ -1605,7 +1606,9 @@ class Textile
 			}
 		}
 
-		// TODO add explanation
+		// Split off any trailing text that isn't part of an array assignment.
+		// eg. "text":...?q[]=value1&q[]=value2      ... is ok
+		//     "text":...?q[]=value1]following  ... would have "following" popped back out and the remaining square bracket will later be tested for balance
 		if( $counts[']']) {
 			if( 1 === preg_match( '@(?P<url>^.*\])(?!=)(?P<end>.*?)$@' . $this->regex_snippets['mod'], $url, $m) ) {
 				$url         = $m['url'];
