@@ -1596,16 +1596,16 @@ class Textile
 			')'  => null,
 		);
 
-		// Look for footnotes at the end of the url...
+		// Look for footnotes at the end of the url... TODO add better explanation
 		if( $counts[']'] ) {
 			if( 1 === preg_match( '@(?P<url>^.*\])(?P<tight>\[.*?)$@' . $this->regex_snippets['mod'], $url, $m ) ) {
 				$url         = $m['url'];
 				$tight       = $m['tight'];
-				//$counts[']'] = mb_substr_count($url, ']', 'UTF-8'); // recount ']' chars
 				$m = array();
 			}
 		}
 
+		// TODO add explanation
 		if( $counts[']']) {
 			if( 1 === preg_match( '@(?P<url>^.*\])(?!=)(?P<end>.*?)$@' . $this->regex_snippets['mod'], $url, $m) ) {
 				$url         = $m['url'];
@@ -1614,27 +1614,29 @@ class Textile
 			}
 		}
 
-		//
+		// Create an array of (possibly) multi-byte characters.
+		// This is going to allow us to pop off any non-matched or nonsense chars from the url
 		$len = mb_strlen($url);
 		for($i = 0; $i < $len; $i++) {
 			$url_chars[] = mb_substr( $url, $i, 1 );
 		}
 
-		// uri_parts now holds an array of all the chars in the url
+		// Now we have the array of all the multi-byte chars in the url
 		$first = true;
 		do {
 			$c = array_pop($url_chars);
 			$popped = false;
 			switch( $c ) {
-				case '.' :
-				case ',' :
+				case '.' :	// url shouldn't end in '.' so pop it off (also matches things like "text":link...)
+				case ',' :  // url shouldn't end in ',' this is very probably punctuation following the url part (eg. blah "text"link, blah)
 						$pop .= $c;
 						$popped = true;
 						break;
-				case ']' :
+				case ']' :  // If we find a closing square bracket we are going to see if it's balanced...
 						if(null===$counts['[']) {
 							$counts['['] = mb_substr_count($url, '[', 'UTF-8');
 						}
+
 						if( $counts['['] === $counts[']'] )
 							array_push($url_chars, $c);  // balanced so keep it
 						else {
@@ -1649,6 +1651,7 @@ class Textile
 							$counts['('] = mb_substr_count($url, '(', 'UTF-8');
 							$counts[')'] = mb_substr_count($url, ')', 'UTF-8');
 						}
+
 						if( $counts['('] === $counts[')'] )
 							array_push($url_chars, $c);  // balanced so keep it
 						else {
@@ -1658,7 +1661,7 @@ class Textile
 						}
 
 						break;
-				default:
+				default: // An acceptable character for the end of the url so push it back and exit the character popping loop
 						array_push($url_chars, $c);
 			}
 			$first = false;
