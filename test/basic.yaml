@@ -761,12 +761,16 @@ Image :
 
     !>http://textpattern.com/favicon.ico!
 
+    !../html/image.jpg!
+
   expect : |
     <p><img src="http://textpattern.com/favicon.ico" alt="" /></p>
 
     <p><img src="http://textpattern.com/favicon.ico" align="left" alt="" /></p>
 
     <p><img src="http://textpattern.com/favicon.ico" align="right" alt="" /></p>
+
+    <p><img src="../html/image.jpg" alt="" /></p>
 
 Images with links :
   input  : |
