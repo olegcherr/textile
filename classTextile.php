@@ -1644,7 +1644,7 @@ class Textile
 							$counts['['] = mb_substr_count($url, '[', 'UTF-8');
 						}
 						if( $counts['['] === $counts[']'] )
-							array_push($url_chars, $c);			// balanced so keep it
+							array_push($url_chars, $c);  // balanced so keep it
 						else {
 							// In the case of un-matched closing square brackets we just eat it
 							$popped = true;
@@ -1658,9 +1658,9 @@ class Textile
 							$counts[')'] = mb_substr_count($url, ')', 'UTF-8');
 						}
 						if( $counts['('] === $counts[')'] )
-							array_push($url_chars, $c);			// balanced so keep it
+							array_push($url_chars, $c);  // balanced so keep it
 						else {
-							$pop .= $c;							// unbalanced so spit it out the back end
+							$pop .= $c;                  // unbalanced so spit it out the back end
 							$counts[')'] -= 1;
 							$popped = true;
 						}
@@ -1689,8 +1689,12 @@ class Textile
 		if( '$' === $text ) {
 			if( $scheme_in_list )
 				$text = ltrim( $this->rebuildURI( $uri_parts, 'authority,path,query,fragment', false ), '/' );
-			else
+			else {
+				if (isset($this->urlrefs[$url]))
+					$url = urldecode($this->urlrefs[$url]);
+
 				$text = $url;
+			}
 		}
 
 		$atts = $this->pba($atts);
