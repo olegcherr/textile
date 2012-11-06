@@ -1552,7 +1552,7 @@ class Textile
 			"                             # literal " marks start of the link
 			(?P<inner>[^"]+?)             # capture the content of the inner "..." part of the link
 			":                            # literal ": marks end of atts + text + title block
-			(?P<url>[\w\/]{1})            # first character following end of displayed chars
+			(?P<url>[\w\/\.]{1})          # first character following end of displayed chars
 			(?P<urlx>[^'.$stopchars.']*)  # url upto a stopchar
 			(?=['.$stopchars.']|\]\[|$)   # lookahead for a stopchar
 			/x'.$this->regex_snippets['mod'], array(&$this, "fLink"), $text);
