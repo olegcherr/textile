@@ -600,6 +600,8 @@ Links :
 
     "Tcl":../html/tcltk.html
 
+    "Participar (para) poder":http://www.unicef.org/argentina/spanish/cartilla_3(1).pdf
+
   expect : |
     <p><a href="http://example.com/">link text</a></p>
 
@@ -634,6 +636,8 @@ Links :
     <p><a href="linkurl" class="linkclass" lang="de-de" id="linkid" title="Link Title"><img src="imgurl" class="imgclass" id="imgid" title="img/link text" alt="img/link text" /></a></p>
 
     <p><a href="../html/tcltk.html">Tcl</a></p>
+
+    <p><a href="http://www.unicef.org/argentina/spanish/cartilla_3%281%29.pdf">Participar (para) poder</a></p>
 
 Array Links :
   input  : |
