@@ -1544,35 +1544,149 @@ class Textile
 	function links($text)
 	{
 		$w = $this->regex_snippets['wrd'];
+		$stopchars = "\s|^';\"*";
+
 		return preg_replace_callback('/
-			(^|(?<=[\s>.\(])|[{[])     # $pre
-			"                          #  start (not captured)
-			(' . $this->c . ')         # $atts
-			([^"]+?)                   # $text
-			(?:\(([^)]+?)\)(?="))?     # $title
-			":
-			('.$this->urlch.'*?[^[])   # $url
-			(\/)?                      # $slash
-			([^'.$w.'\/\[;]*?)         # $post
-			([\]}]|(?=\s|$|\)))        # $tail
+			(?P<pre>\[)?                  # Optionally open with a square bracket eg. Look ["here":url]
+			"                             # literal " marks start of the link
+			(?P<inner>[^"]+?)             # capture the content of the inner "..." part of the link
+			":                            # literal ": marks end of atts + text + title block
+			(?P<url>[\w\/]{1})            # first character following end of displayed chars
+			(?P<urlx>[^'.$stopchars.']*)  # url upto a stopchar
+			(?=['.$stopchars.']|\]\[|$)   # lookahead for a stopchar
 			/x'.$this->regex_snippets['mod'], array(&$this, "fLink"), $text);
 	}
 
 // -------------------------------------------------------------
 	function fLink($m)
 	{
-		list(, $pre, $atts, $text, $title, $url, $slash, $post, $tail) = $m;
 
-		$uri_parts = array();
+		$in    = $m[0];
+		$pre   = $m['pre'];
+		$inner = $m['inner'];
+		$url   = $m['url'] . $m['urlx'];
+		$m = array();
+
+		/* preg_match( '/ */
+		/* 	^ */
+		/* 	(?P<atts>' . $this->c . ')   # $atts */
+		/* 	(?P<text>[^(]+?)             # $text */
+		/* 	(?:\((?P<title>[^)]+?)\))?   # $title */
+		/* 	$ */
+		/* 	/x'.$this->regex_snippets['mod'], $inner, $m */
+		/* ); */
+		// Split inner into $atts, $text and $title..
+		preg_match( '/
+			^
+			(?P<atts>' . $this->c . ')   # $atts (if any)
+			(?P<text>                    # $text is...
+				(!.+!)                   #     an image
+				|                        #   else...
+				[^(]+?                   #     link text
+			)                            # end of $text
+			(?:\((?P<title>[^)]+?)\))?   # $title (if any)
+			$
+			/x'.$this->regex_snippets['mod'], $inner, $m
+		);
+		$atts  = isset($m['atts'])  ? $m['atts']  : '';
+		$text  = isset($m['text'])  ? $m['text']  : $inner;
+		$title = isset($m['title']) ? $m['title'] : '';
+		$m = array();
+
+		// Parse the uri backwards and pop off any chars that don't belong there (like . or , or unmatched brackets of various kinds)...
+		$pop = $tight = '';
+		$url_chars = array();
+		$counts = array(
+			'['  => null,
+			']'  => mb_substr_count($url, ']', 'UTF-8'),
+			'('  => null,
+			')'  => null,
+		);
+
+		// Look for footnotes at the end of the url...
+		if( $counts[']'] ) {
+			if( 1 === preg_match( '@(?P<url>^.*\])(?P<tight>\[.*?)$@' . $this->regex_snippets['mod'], $url, $m ) ) {
+				$url         = $m['url'];
+				$tight       = $m['tight'];
+				//$counts[']'] = mb_substr_count($url, ']', 'UTF-8'); // recount ']' chars
+				$m = array();
+			}
+		}
+
+		if( $counts[']']) {
+			if( 1 === preg_match( '@(?P<url>^.*\])(?!=)(?P<end>.*?)$@' . $this->regex_snippets['mod'], $url, $m) ) {
+				$url         = $m['url'];
+				$tight       = $m['end'] . $tight;
+				$m = array();
+			}
+		}
+
+		//
+		$len = mb_strlen($url);
+		for($i = 0; $i < $len; $i++) {
+			$url_chars[] = mb_substr( $url, $i, 1 );
+		}
+
+
+
+		// uri_parts now holds an array of all the chars in the url
+		$first = true;
+		do {
+			$c = array_pop($url_chars);
+			$popped = false;
+			switch( $c ) {
+				case '.' :
+				case ',' :
+						$pop .= $c;
+						$popped = true;
+						break;
+				case ']' :
+						if(null===$counts['[']) {
+							$counts['['] = mb_substr_count($url, '[', 'UTF-8');
+						}
+						if( $counts['['] === $counts[']'] )
+							array_push($url_chars, $c);			// balanced so keep it
+						else {
+							// In the case of un-matched closing square brackets we just eat it
+							$popped = true;
+							$counts[']'] -= 1;
+							if( $first ) $pre = '';
+						}
+						break;
+				case ')' :
+						if(null===$counts[')']) {
+							$counts['('] = mb_substr_count($url, '(', 'UTF-8');
+							$counts[')'] = mb_substr_count($url, ')', 'UTF-8');
+						}
+						if( $counts['('] === $counts[')'] )
+							array_push($url_chars, $c);			// balanced so keep it
+						else {
+							$pop .= $c;							// unbalanced so spit it out the back end
+							$counts[')'] -= 1;
+							$popped = true;
+						}
+
+						break;
+				default:
+						array_push($url_chars, $c);
+			}
+			$first = false;
+		} while( $popped );
+
+		// Pull the possibly truncated URL back together...
+		$url = implode('', $url_chars);
+
+		// Parse the url into constituent parts...
 		$this->parseURI( $url, $uri_parts );
 
+		// Check this is a valid uri scheme...
 		$scheme         = $uri_parts['scheme'];
 		$scheme_in_list = in_array( $scheme, $this->url_schemes );
-		$scheme_ok = '' === $scheme || $scheme_in_list;
-
+		$scheme_ok      = '' === $scheme || $scheme_in_list;
 		if( !$scheme_ok )
-			return $m[0];
+			return $in;
 
+		// Handle self-referencing links...
 		if( '$' === $text ) {
 			if( $scheme_in_list )
 				$text = ltrim( $this->rebuildURI( $uri_parts, 'authority,path,query,fragment', false ), '/' );
@@ -1586,22 +1700,20 @@ class Textile
 		if (!$this->noimage)
 			$text = $this->image($text);
 
+		// Prep the text...
 		$text = $this->span($text);
 		$text = $this->glyphs($text);
-		$url  = $this->shelveURL( $this->rebuildURI( $uri_parts ) . $slash );
+
+		$url  = $this->rebuildURI( $uri_parts );
+		$url  = $this->shelveURL( $url );
 
 		$opentag  = '<a href="' . $url . '"' . $atts . $this->rel . '>';
 		$closetag = '</a>';
 		$tags     = $this->storeTags($opentag, $closetag);
 		$out      = $tags['open'].trim($text).$tags['close'];
 
-		if (($pre and !$tail) or ($tail and !$pre))
-		{
-			$out = $pre.$out.$post.$tail;
-			$post = '';
-		}
-
-		return $this->shelve($out).$post;
+		$out      = $this->shelve($out);	// Shelve the link we just built
+		return $pre . $out . $pop . $tight;	// return the shelf id and the $pop'd characters
 	}
 
 // -------------------------------------------------------------
