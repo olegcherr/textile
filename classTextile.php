@@ -1582,9 +1582,16 @@ class Textile
 			/x'.$this->regex_snippets['mod'], $inner, $m
 		);
 		$atts  = isset($m['atts'])  ? $m['atts']  : '';
-		$text  = isset($m['text'])  ? $m['text']  : $inner;
+		$text  = isset($m['text'])  ? trim($m['text'])  : $inner;
 		$title = isset($m['title']) ? $m['title'] : '';
 		$m = array();
+
+		// In cases like; "(myclass) (just in case you were wondering)":http://slashdot.org/
+		// Where the middle text field is empty and there is a valid title field, we use that for the text.
+		if(!$text && $title) {
+			$text  = "($title)";
+			$title = '';
+		}
 
 		$pop = $tight = '';
 		$url_chars = array();
@@ -1633,11 +1640,15 @@ class Textile
 			$c = array_pop($url_chars);
 			$popped = false;
 			switch( $c ) {
+
+				// URL shouldn't end in these characters, so pop them off and return them after the link.
+				case '!' :
 				case '.' :	// url shouldn't end in '.' so pop it off (also matches things like "text":link...)
 				case ',' :  // url shouldn't end in ',' this is very probably punctuation following the url part (eg. blah "text"link, blah)
 						$pop .= $c;
 						$popped = true;
 						break;
+
 				case ']' :  // If we find a closing square bracket we are going to see if it's balanced...
 						if(null===$counts['[']) {
 							$counts['['] = mb_substr_count($url, '[', 'UTF-8');
@@ -1652,6 +1663,7 @@ class Textile
 							if( $first ) $pre = '';
 						}
 						break;
+
 				case ')' :
 						if(null===$counts[')']) {
 							$counts['('] = mb_substr_count($url, '(', 'UTF-8');
@@ -1665,8 +1677,8 @@ class Textile
 							$counts[')'] -= 1;
 							$popped = true;
 						}
-
 						break;
+
 				default: // An acceptable character for the end of the url so push it back and exit the character popping loop
 						array_push($url_chars, $c);
 			}
