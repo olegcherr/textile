@@ -965,19 +965,20 @@ Redcloth Links:
     </ul>
 
 Complex links :
-  assert : skip
   notes  : >
-    Pulled from the Redcloth link fixtures...
+    Pulled from (or inspired by) the Redcloth link fixtures...
   input  : |
-    "(myclass)(just in case you were wondering)(Title!)":http://slashdot.org/
+    "(myclass)[fr-FR]{color:red} just in case you were wondering(Title!)":http://slashdot.org/
 
     The ION coding style document found at "IONCodingStyleGuide.doc":http://perforce:8081/@md=d&cd=//&c=82E@//depot/systest/system/main/pub/doc/IONCodingStyleGuide.doc?ac=22 codifies a couple of rules to ensure reasonably consistent code and documentation of libraries in ION. Test text
 
     "He said it is "very unlikely" the "economic stimulus" works":http://slashdot.org/
 
     ""Open the pod bay doors please, HAL."":http://www.youtube.com/watch?v=npN9l2Bd06s
+
+    Here is [^"[de] "A def[inition]" (title)":url^] if you can believe it!
   expect : |
-    <p><a href="http://slashdot.org/" class="myclass" title="Title!">(just in case you were wondering)</a></p>
+    <p><a href="http://slashdot.org/" style="color:red;" class="myclass" lang="fr-FR" title="Title!">just in case you were wondering</a></p>
 
     <p>The <span class="caps">ION</span> coding style document found at <a href="http://perforce:8081/@md=d&amp;cd=//&amp;c=82E@//depot/systest/system/main/pub/doc/IONCodingStyleGuide.doc?ac=22">IONCodingStyleGuide.doc</a> codifies a couple of rules to ensure reasonably consistent code and documentation of libraries in <span class="caps">ION</span>. Test text</p>
 
@@ -1087,7 +1088,7 @@ Array Links :
 
     <p>&#8230;blah blah<sup><a href="http://github.com?param[]=val&amp;par2[]=val2&amp;l=en&amp;enc=utf-8#end">on github</a></sup>blah&#8230;</p>
 
-    <p>&#8230;blah blah (for more details look on <a href="http://github.com?q[]=one%2C2#end">github</a>) blah blah&#8230;</p>
+    <p>&#8230;blah blah (for more details look on <a href="http://github.com?q[]=one,2#end">github</a>) blah blah&#8230;</p>
 
     <p>[Here] is <a href="http://thresholdstate.com/?q[]=true">a link</a>, and <a href="http://thresholdstate.com/?q[]=true">another link</a>, to the <sup><a href="https://github.com/netcarver/?lang=en&amp;q[]">same</a></sup> site.</p>
 
