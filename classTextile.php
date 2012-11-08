@@ -1544,20 +1544,111 @@ class Textile
 // -------------------------------------------------------------
 	function links($text)
 	{
+		// TODO Try not using preg_split: as colon's are more infrequent than
+		// '"' try a simple explode on ':' then if first char in block is a
+		// space it's not a link else if last char of preceeding block is not a
+		// " it's not a link
+		$t = preg_split('/":/', $text); // Split on '":' boundaries
+
+		try {
+			if(count($t) > 1) {
+
+				$lastpart = array_pop($t); // There are no start of links in the last part, so pop it off (we'll glue it back later)
+
+				foreach($t as $i=>$snippet) {
+
+					// Cut this snippet into parts wherever we find a '"' character.
+					// Any of these parts could represent the start of the link text, we need to find which part.
+					$f = explode('"', $snippet);
+					$n = count($f);
+
+					// Cleanup situations like "He said it is "very unlikely" the stimulus works ":url
+					//                                                   Space at end ----------^
+					$f[$n-1] = rtrim($f[$n-1]);
+
+					// Init the balanced count. If this is still zero at the end of our do loop we'll mark the " that caused it to balance and move on to the next link
+					$balanced = 0;
+
+					// Vars we need in our balance checking loop...
+					$linkparts = array();
+					$iter = 0;
+
+					do {
+						// Starting at the end, pop off the next part of the snippet's fragments
+						$p = array_pop($f);
+						if( null === $p )
+							throw new exception("Malformed link found.");
+
+						// add this part to those parts that make up the link text
+						$linkparts[] = $p;
+						$len = strlen($p) > 0;
+
+						$first = substr($p,  0, 1);
+						$last  = substr($p, -1, 1);
+
+						if( $len ) {
+							// did this part inc or dec the balanced count?
+							if( !ctype_space( $first ) ) $balanced--;
+							if( '=' == $last )           $balanced--;
+							if( !ctype_space( $last  ) ) $balanced++;
+						}
+
+						// If quotes occur next to each other, we get zero length strings eg. ...""Open the door, HAL!"":url...
+						// In this case we count a zero length in the last position as a closing quote and others as opening quotes
+						if( !$len ) $balanced = (!$iter++) ? $balanced+1 : $balanced-1;
+
+					} while( 0 != $balanced );
+
+					// rebuild the link's text by reversing the parts and glueing them back together with quotes
+					$link_start = implode('"', array_reverse($linkparts));
+
+					// rebuild the remaining stuff that goes before the link but that's already in order
+					$pre_link   = implode('"', $f);
+
+					// Re-assemble the link starts with a specific ':"' marker for the regex
+					$t[$i] = $pre_link . ':"' . $link_start;
+				}
+
+				// Add the last part back
+				array_push($t, $lastpart);
+			}
+
+			// Re-assemble the full text with the start and end markers
+			$text = implode('":', $t);
+
+			$starts = preg_split( '/(\[?:")/', $text, NULL, PREG_SPLIT_DELIM_CAPTURE ); // << Try simple split on ':' if next char is a '"' it's a link and look back for preceeding char
+			if(1 === count($starts))
+				return $text;
+
+			/* echo var_export( $starts, true ), "\n\n"; */
+			/* foreach($starts as $link) { */
+			/* } */
+
+		//	die();
+		}
+		catch(exception $e) {
+			// If we got an exception pre-parsing the links then let the regex try sorting it out...
+		}
+
+		// Process it
+		return $this->links2($text);
+	}
+// -------------------------------------------------------------
+	function links2($text)
+	{
 		$w = $this->regex_snippets['wrd'];
 		$stopchars = "\s|^';\"*";
 
 		return preg_replace_callback('/
 			(?P<pre>\[)?                  # Optionally open with a square bracket eg. Look ["here":url]
-			"                             # literal " marks start of the link
-			(?P<inner>[^"]+?)             # capture the content of the inner "..." part of the link, can be anything except " but
+			(:)"                          # literal " marks start of the link
+			(?P<inner>.+?)                # capture the content of the inner "..." part of the link, can be anything except " but
 			                              # do not worry about matching class, id, lang or title yet
 			":                            # literal ": marks end of atts + text + title block
 			(?P<url>[\w\.\/?#]{1})        # first character following end of displayed chars
 			(?P<urlx>[^'.$stopchars.']*)  # url upto a stopchar
 			/x'.$this->regex_snippets['mod'], array(&$this, "fLink"), $text);
 	}
-
 // -------------------------------------------------------------
 	function fLink($m)
 	{
@@ -1696,7 +1787,7 @@ class Textile
 		$scheme_in_list = in_array( $scheme, $this->url_schemes );
 		$scheme_ok      = '' === $scheme || $scheme_in_list;
 		if( !$scheme_ok )
-			return $in;
+			return strtr($in, array(':"'=>'"'));
 
 		// Handle self-referencing links...
 		if( '$' === $text ) {
