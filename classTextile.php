@@ -1641,9 +1641,9 @@ class Textile
 			(?P<inner>.+?)                # capture the content of the inner "..." part of the link, can be anything but
 			                              # do not worry about matching class, id, lang or title yet
 			":                            # literal ": marks end of atts + text + title block
-			(?P<url>[\w\.\/?#]{1})        # first character following end of displayed chars
 			(?P<urlx>[^'.$stopchars.']*)  # url upto a stopchar
 			/x'.$this->regex_snippets['mod'], array(&$this, "fLink"), $text);
+			#(?P<url>[\w\.\/?#]{1})        # first character following end of displayed chars
 	}
 // -------------------------------------------------------------
 	function fLink($m)
@@ -1652,8 +1652,12 @@ class Textile
 		$in    = $m[0];
 		$pre   = $m['pre'];
 		$inner = $m['inner'];
-		$url   = $m['url'] . $m['urlx'];
+		$url   = $m['urlx']; // . $m['urlx'];
 		$m = array();
+
+		// Reject invalid urls such as "linktext": which has no url part.
+		if('' === $url)
+			return strtr($in, array(':"'=>'"'));
 
 		// Split inner into $atts, $text and $title..
 		preg_match( '/
