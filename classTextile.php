@@ -1544,10 +1544,6 @@ class Textile
 // -------------------------------------------------------------
 	function links($text)
 	{
-		// TODO Try not using preg_split: as colon's are more infrequent than
-		// '"' try a simple explode on ':' then if first char in block is a
-		// space it's not a link else if last char of preceeding block is not a
-		// " it's not a link
 		$t = preg_split('/":/', $text); // Split on '":' boundaries
 
 		try {
