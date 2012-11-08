@@ -1688,7 +1688,7 @@ class Textile
 		$url_chars = array();
 		$counts = array(
 			'['  => null,
-			']'  => mb_substr_count($url, ']', 'UTF-8'), # We need to know how many closing square brackets we have
+			']'  => substr_count($url, ']'), # We need to know how many closing square brackets we have
 			'('  => null,
 			')'  => null,
 		);
@@ -1717,11 +1717,12 @@ class Textile
 			}
 		}
 
+		// Does this need to be mb_ enabled? We are only searching for text in the ASCII charset anyway
 		// Create an array of (possibly) multi-byte characters.
 		// This is going to allow us to pop off any non-matched or nonsense chars from the url
-		$len = mb_strlen($url);
+		$len = strlen($url);
 		for($i = 0; $i < $len; $i++) {
-			$url_chars[] = mb_substr( $url, $i, 1 );
+			$url_chars[] = substr( $url, $i, 1 );
 		}
 
 		// Now we have the array of all the multi-byte chars in the url we will parse the uri backwards and pop off
@@ -1742,7 +1743,7 @@ class Textile
 
 				case ']' :  // If we find a closing square bracket we are going to see if it's balanced...
 						if(null===$counts['[']) {
-							$counts['['] = mb_substr_count($url, '[', 'UTF-8');
+							$counts['['] = substr_count($url, '[');
 						}
 
 						if( $counts['['] === $counts[']'] )
@@ -1757,8 +1758,8 @@ class Textile
 
 				case ')' :
 						if(null===$counts[')']) {
-							$counts['('] = mb_substr_count($url, '(', 'UTF-8');
-							$counts[')'] = mb_substr_count($url, ')', 'UTF-8');
+							$counts['('] = substr_count($url, '(');
+							$counts[')'] = substr_count($url, ')');
 						}
 
 						if( $counts['('] === $counts[')'] )
