@@ -1642,7 +1642,7 @@ class Textile
 		return preg_replace_callback('/
 			(?P<pre>\[)?                  # Optionally open with a square bracket eg. Look ["here":url]
 			(:)"                          # literal " marks start of the link
-			(?P<inner>.+?)                # capture the content of the inner "..." part of the link, can be anything except " but
+			(?P<inner>.+?)                # capture the content of the inner "..." part of the link, can be anything but
 			                              # do not worry about matching class, id, lang or title yet
 			":                            # literal ": marks end of atts + text + title block
 			(?P<url>[\w\.\/?#]{1})        # first character following end of displayed chars
