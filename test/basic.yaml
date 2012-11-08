@@ -985,6 +985,75 @@ Complex links :
 
     <p><a href="http://www.youtube.com/watch?v=npN9l2Bd06s">&#8220;Open the pod bay doors please, <span class="caps">HAL</span>.&#8221;</a></p>
 
+    <p>Here is <sup><a href="url" lang="de" title="title">&#8220;A def[inition]&#8221;</a></sup> if you can believe it!</p>
+Links in tables... :
+  input:  |
+    | "abc":url |
+
+    | "abc":url|
+    
+    |"abc":url |
+    
+    |"abc":url|
+
+    |"abc":url|"def":url2|
+
+    |"(class)abc(title)":url|"[en-GB]def[inition]":url2|
+
+    |""福島駅"":http://ja.wikipedia.org/wiki/福島駅_(大阪府)/?q[]=x.|
+
+    |["(class)[de] "A def[inition]" (title)":../uri?q[x]=123#fr]|
+
+  expect: |
+    <table>
+    <tr>
+    <td> <a href="url">abc</a> </td>
+    </tr>
+    </table>
+
+    <table>
+    <tr>
+    <td> <a href="url">abc</a></td>
+    </tr>
+    </table>
+
+    <table>
+    <tr>
+    <td><a href="url">abc</a> </td>
+    </tr>
+    </table>
+
+    <table>
+    <tr>
+    <td><a href="url">abc</a></td>
+    </tr>
+    </table>
+
+    <table>
+    <tr>
+    <td><a href="url">abc</a></td>
+    <td><a href="url2">def</a></td>
+    </tr>
+    </table>
+
+    <table>
+    <tr>
+    <td><a href="url" class="class" title="title">abc</a></td>
+    <td><a href="url2" lang="en-GB">def[inition]</a></td>
+    </tr>
+    </table>
+
+    <table>
+    <tr>
+    <td><a href="http://ja.wikipedia.org/wiki/%E7%A6%8F%E5%B3%B6%E9%A7%85_%28%E5%A4%A7%E9%98%AA%E5%BA%9C%29/?q[]=x">&#8220;福島駅&#8221;</a>.</td>
+    </tr>
+    </table>
+
+    <table>
+    <tr>
+    <td><a href="../uri?q[x]=123#fr" class="class" lang="de" title="title">&#8220;A def[inition]&#8221;</a></td>
+    </tr>
+    </table>
 
 Array Links :
   input  : |
