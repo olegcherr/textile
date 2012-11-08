@@ -1666,7 +1666,7 @@ class Textile
 			(?P<text>                    # $text is...
 				(!.+!)                   #     an image
 				|                        #   else...
-				[^(]+?                   #     link text
+				\(?[^(]+?                #     link text
 			)                            # end of $text
 			(?:\((?P<title>[^)]+?)\))?   # $title (if any)
 			$
