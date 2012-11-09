@@ -1158,7 +1158,11 @@ Mixed XHTML and Textile Links :
     Reported here... http://forum.textpattern.com/viewtopic.php?pid=157506#p157506
   input  : |
     <a href="http://example.org" title="_dummy">example.org</a> _word_ abc
+
+    "example.org(_dummy)":http://example.org _word_ abc
   expect : |
+    <p><a href="http://example.org" title="_dummy">example.org</a> <em>word</em> abc</p>
+
     <p><a href="http://example.org" title="_dummy">example.org</a> <em>word</em> abc</p>
 
 Links with quoted text :
@@ -1456,9 +1460,17 @@ Issue 50 Bust-a-quotes:
     If this is fully XHMTL, character entities should be used at the start and end of the string.
     If it's textile, then it should be "%[en]test%" or %[en]"test"%.
   input: |
-    "<span lang="en">test</span>"
+    "<span lang="en">test</span>" bad!
+
+    %[en]"test"% good!
+
+    "%[en]test%" good!
   expect: |
-    <p>&#8220;<span lang="en">test</span>&#8221;</p>
+    <p>&#8220;<span lang="en">test</span>&#8221; bad!</p>
+
+    <p><span lang="en">&#8220;test&#8221;</span> good!</p>
+
+    <p>&#8220;<span lang="en">test</span>&#8221; good!</p>
 
 Issue 50 Fixes:
   notes: >
