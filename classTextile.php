@@ -1737,7 +1737,7 @@ class Textile
 				case '!' :
 				case '.' :	// url shouldn't end in '.' so pop it off (also matches things like "text":link...)
 				case ',' :  // url shouldn't end in ',' this is very probably punctuation following the url part (eg. blah "text"link, blah)
-						$pop .= $c;
+						$pop = $c . $pop;
 						$popped = true;
 						break;
 
@@ -1765,7 +1765,7 @@ class Textile
 						if( $counts['('] === $counts[')'] )
 							array_push($url_chars, $c);  // balanced so keep it
 						else {
-							$pop .= $c;                  // unbalanced so spit it out the back end
+							$pop = $c . $pop;                  // unbalanced so spit it out the back end
 							$counts[')'] -= 1;
 							$popped = true;
 						}
