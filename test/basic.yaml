@@ -643,6 +643,97 @@ Links :
 
     <p><a href="http://www.unicef.org/argentina/spanish/cartilla_3%281%29.pdf">Participar (para) poder</a></p>
 
+Quoted double-quote in links:
+  input  : |
+    "The use of the character " in textile":help.html..!
+
+    ""The use of the character " in textile"":help.html..!
+
+    ""The use of the character """ in textile"":help.html..!
+
+    "The use of the character """ in textile":help.html..!
+
+    "The use of the character '"' in textile":help.html..!
+
+    ""The use of the character '"' in textile"":help.html..!
+
+    "The use of the character {"} in textile":help.html..!
+
+    ""The use of the character {"} in textile"":help.html..!
+
+    "The use of the character ["] in textile":help.html..!
+
+    ""The use of the character ["] in textile"":help.html..!
+
+    "The use of the character (") in textile":help.html..!
+
+    ""The use of the character (") in textile"":help.html..!
+
+    "The use of the character «"» in textile":help.html..!
+
+    ""The use of the character «"» in textile"":help.html..!
+
+    "The use of the character »"« in textile":help.html..!
+
+    "The use of the character ‹"› in textile":help.html..!
+
+    "The use of the character ›"‹ in textile":help.html..!
+
+    "The use of the character „"“ in textile":help.html..!
+
+    "The use of the character ‚"‘ in textile":help.html..!
+
+    "The use of the character ‘"’ in textile":help.html..!
+
+    "The use of the character ”"“ in textile":help.html..!
+
+    "'The use of the character " in textile'":help.html..!
+
+  expect : |
+    <p><a href="help.html">The use of the character &#8220; in textile</a>..!</p>
+
+    <p><a href="help.html">&#8220;The use of the character &#8220; in textile&#8221;</a>..!</p>
+
+    <p><a href="help.html">&#8220;The use of the character &#8220;"&#8221; in textile&#8221;</a>..!</p>
+
+    <p><a href="help.html">The use of the character &#8220;"&#8221; in textile</a>..!</p>
+
+    <p><a href="help.html">The use of the character &#8216;"&#8217; in textile</a>..!</p>
+
+    <p><a href="help.html">&#8220;The use of the character &#8216;"&#8217; in textile&#8221;</a>..!</p>
+
+    <p><a href="help.html">The use of the character {"} in textile</a>..!</p>
+
+    <p><a href="help.html">&#8220;The use of the character {"} in textile&#8221;</a>..!</p>
+
+    <p><a href="help.html">The use of the character ["] in textile</a>..!</p>
+
+    <p><a href="help.html">&#8220;The use of the character ["] in textile&#8221;</a>..!</p>
+
+    <p><a href="help.html">The use of the character (") in textile</a>..!</p>
+
+    <p><a href="help.html">&#8220;The use of the character (") in textile&#8221;</a>..!</p>
+
+    <p><a href="help.html">The use of the character «"» in textile</a>..!</p>
+
+    <p><a href="help.html">&#8220;The use of the character «"» in textile&#8221;</a>..!</p>
+
+    <p><a href="help.html">The use of the character »"« in textile</a>..!</p>
+
+    <p><a href="help.html">The use of the character ‹"› in textile</a>..!</p>
+
+    <p><a href="help.html">The use of the character ›"‹ in textile</a>..!</p>
+
+    <p><a href="help.html">The use of the character „"“ in textile</a>..!</p>
+
+    <p><a href="help.html">The use of the character ‚"‘ in textile</a>..!</p>
+
+    <p><a href="help.html">The use of the character ‘"’ in textile</a>..!</p>
+
+    <p><a href="help.html">The use of the character ”"“ in textile</a>..!</p>
+
+    <p><a href="help.html">&#8216;The use of the character &#8220; in textile&#8217;</a>..!!</p>
+
 Redcloth Links:
   input  : |
     "testing":

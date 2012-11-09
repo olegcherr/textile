@@ -486,6 +486,23 @@ class Textile
 			txt_plusminus,                         // plus minus
 		);
 
+		$this->quotes = array(
+			'"' => '"',
+			"'" => "'",
+			'(' => ')',
+			'{' => '}',
+			'[' => ']',
+			'«' => '»',
+			'»' => '«',
+			'‹' => '›',
+			'›' => '‹',
+			'„' => '“',
+			'‚' => '‘',
+			'‘' => '’',
+			'”' => '“',
+		);
+		$this->quote_starts = strtr(preg_quote(implode('|', array_keys($this->quotes))), array('\|'=>'|') );
+
 		if (defined('hu'))
 			$this->hu = hu;
 
@@ -1542,8 +1559,25 @@ class Textile
 	}
 
 // -------------------------------------------------------------
+	function glyphQuotedQuote($text)
+	{
+		return preg_replace_callback( '/ (?P<pre>'.$this->quote_starts.')"(?P<post>.) /'.$this->regex_snippets['mod'], array(&$this, "fGlyphQuotedQuote"), $text);
+	}
+
+	function fGlyphQuotedQuote($m)
+	{
+		// Check the correct closing character was found...
+		if($m['post'] !== @$this->quotes[$m['pre']]) return $m[0];
+
+		$glyph = ' ' . strtr($m['pre'], array( '"'=>'&#8220;', "'"=>'&#8216;', ' '=>'&nbsp;' )) . '"' . strtr($m['post'], array( '"'=> '&#8221;', "'"=>'&#8217;', ' '=>'&nbsp;' )) . ' ';
+		return $this->shelve($glyph);
+	}
+// -------------------------------------------------------------
 	function links($text)
 	{
+		// Treat quoted quote as a special glyph
+		$text = $this->glyphQuotedQuote($text);
+
 		$t = preg_split('/":/', $text); // Split on '":' boundaries
 
 		try {
