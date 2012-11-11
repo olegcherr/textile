@@ -522,9 +522,7 @@ class Textile
 
 	function prepare($lite, $noimage, $rel)
 	{
-		$this->urlshelf = array();
-		$this->urlrefs  = array();
-		$this->shelf    = array();
+		$this->urlshelf = $this->urlrefs = $this->shelf = array();
 		$this->span_depth = 0;
 		$this->tag_index = 1;
 		$this->notes = $this->unreferencedNotes = $this->notelist_cache = array();
@@ -546,27 +544,12 @@ class Textile
 			$text = $this->incomingEntities($text);
 			$text = str_replace("x%x%", "&amp;", $text);
 			return $text;
-		} else {
-			if(!$strict) {
-				$text = $this->cleanWhiteSpace($text);
-			}
-
-			if(!$lite) {
-				$text = $this->block($text);
-				$text = $this->placeNoteLists($text);
-			}
-
-			$text = $this->retrieve($text);
-			$text = $this->replaceGlyphs($text);
-			$text = $this->retrieveTags($text);
-			$text = $this->retrieveURLs($text);
-			$this->span_depth = 0;
-
-			// just to be tidy
-			$text = str_replace("<br />", "<br />\n", $text);
-
-			return $text;
 		}
+
+		if(!$strict)
+			$text = $this->cleanWhiteSpace($text);
+
+		return $this->textileCommon($text, $lite);
 	}
 
 // -------------------------------------------------------------
@@ -581,8 +564,16 @@ class Textile
 		$text = $this->encode_html($text, 0);
 		$text = $this->cleanWhiteSpace($text);
 
+		return $this->textileCommon($text, $lite);
+	}
+
+// -------------------------------------------------------------
+
+	function textileCommon($text, $lite)
+	{
 		if($lite) {
-			$text = $this->blockLite($text);
+			$this->btag = array('bq', 'p');
+			$text = $this->block($text."\n\n");
 		} else {
 			$text = $this->block($text);
 			$text = $this->placeNoteLists($text);
@@ -592,7 +583,6 @@ class Textile
 		$text = $this->replaceGlyphs($text);
 		$text = $this->retrieveTags($text);
 		$text = $this->retrieveURLs($text);
-		$this->span_depth = 0;
 
 		// just to be tidy
 		$text = str_replace("<br />", "<br />\n", $text);
@@ -2278,14 +2268,6 @@ class Textile
 		foreach (func_get_args() as $a)
 			echo "\n<pre>",(is_array($a)) ? print_r($a) : ((is_bool($a)) ? $bool[(int)$a] : $a), "</pre>\n";
 		return $this;
-	}
-
-// -------------------------------------------------------------
-
-	function blockLite($text)
-	{
-		$this->btag = array('bq', 'p');
-		return $this->block($text."\n\n");
 	}
 
 
